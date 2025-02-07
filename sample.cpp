@@ -1,90 +1,8 @@
-#include <vector>
-#include <stdexcept>
-#include <cmath>
-
-class ImageSegmenter {
-public:
-    struct ImageSegment {
-        unsigned char* data;
-        size_t startRow;
-        size_t numRows;
-        size_t width;
-        size_t channels;
-    };
-
-    /**
-     * Segments image data into chunks based on number of threads
-     * @param imageData Pointer to the image data array
-     * @param height Total height of the image in pixels
-     * @param width Width of the image in pixels
-     * @param channels Number of color channels
-     * @param numThreads Number of threads to split the image into
-     * @return Vector of ImageSegment structures containing the segmented data
-     */
-    static std::vector<ImageSegment> segmentImageByThreads(
-        unsigned char* imageData,
-        size_t height,
-        size_t width,
-        size_t channels,
-        size_t numThreads
-    ) {
-        if (imageData == nullptr) {
-            throw std::invalid_argument("Image data pointer cannot be null");
-        }
-        if (numThreads == 0) {
-            throw std::invalid_argument("Number of threads must be greater than 0");
-        }
-        if (height == 0 || width == 0 || channels == 0) {
-            throw std::invalid_argument("Image dimensions must be greater than 0");
-        }
-
-        std::vector<ImageSegment> segments;
-        segments.reserve(numThreads);
-
-        // Calculate base rows per thread and remaining rows
-        size_t baseRowsPerThread = height / numThreads;
-        size_t remainingRows = height % numThreads;
-        size_t currentRow = 0;
-
-        // Create segments
-        for (size_t threadIdx = 0; threadIdx < numThreads; ++threadIdx) {
-            size_t rowsForThisThread = baseRowsPerThread;
-            if (threadIdx < remainingRows) {
-                rowsForThisThread++;
-            }
-
-            // Calculate pointer to the start of this segment
-            size_t offset = currentRow * width * channels;
-            ImageSegment segment{
-                imageData + offset,  // Pointer to start of segment data
-                currentRow,         // Starting row
-                rowsForThisThread,  // Number of rows in this segment
-                width,              // Width of the image
-                channels           // Number of channels
-            };
-
-            segments.push_back(segment);
-            currentRow += rowsForThisThread;
-        }
-
-        return segments;
-    }
-
-    /**
-     * Helper function to get the total size in bytes for a segment
-     * @param segment The image segment
-     * @return Total size in bytes
-     */
-    static size_t getSegmentSize(const ImageSegment& segment) {
-        return segment.numRows * segment.width * segment.channels;
-    }
-};
-
 
 
 
 /////////////////////////////////////////////////////////////////
-
+/*
 
 #include <iostream>
 #include <vector>
@@ -162,3 +80,6 @@ int main() {
 
     return 0;
 }
+
+
+*/

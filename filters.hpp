@@ -1,12 +1,13 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
+#include "types.hpp"
 
 class Filters
 {
     public:
 
-    unsigned char* filter_data; 
+    us_ch* filter_data; 
     int height,width,channels;
 
     Filters(Image img)
@@ -19,15 +20,15 @@ class Filters
 
     void convertToGrayscale()
     {
-        for (int y = 0; y < height; ++y) 
+        for (int i = 0; i < height; ++i) 
         {
-            for (int x = 0; x < width; ++x) 
+            for (int j = 0; j < width; ++j) 
             {
-                int index = (y * width + x) * channels;
-                unsigned char r = filter_data[index];
-                unsigned char g = filter_data[index + 1];
-                unsigned char b = filter_data[index + 2];
-                unsigned char gray = static_cast<unsigned char>(0.299f * r + 0.587f * g + 0.114f * b);
+                int index = (i * width + j) * channels;
+                us_ch r = filter_data[index];
+                us_ch g = filter_data[index + 1];
+                us_ch b = filter_data[index + 2];
+                us_ch gray = static_cast<us_ch>(0.299f * r + 0.587f * g + 0.114f * b);
                 filter_data[index] = filter_data[index + 1] = filter_data[index + 2] = gray;
             }
         }

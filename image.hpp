@@ -12,7 +12,7 @@ class Image
     public:
 
     //variables
-    char *file_name,*dest_folder;
+    char *file_name;
     unsigned char* img_data;
     int height,width,channels;
 
