@@ -31,8 +31,6 @@ class ImageSegment
 
         const int baseRowPerSegment = image.height / numThread;
         int remainingRow = image.height % numThread;
-        // const int baseRowPerSegment = 10 / numThread;
-        // int remainingRow = 10 % numThread;
         int currentRow=0;
 
         for(int ind = 0; ind < numThread; ind++)
@@ -75,7 +73,9 @@ static us_ch* reconstructImage(std::vector<IMGSEG> segments, int fHeight, int fW
                 // Ensure index is within bounds
                 if (imgIndex + 2 < fHeight * fWidth * 3)
                 {
-                    finalImg[imgIndex] = finalImg[imgIndex + 1] = finalImg[imgIndex + 2] = seg.img_data[segIndex];
+                    finalImg[imgIndex] = seg.img_data[segIndex];
+                    finalImg[imgIndex + 1] = seg.img_data[segIndex+1];
+                    finalImg[imgIndex + 2] = seg.img_data[segIndex+2];
                 }
             }
         }
