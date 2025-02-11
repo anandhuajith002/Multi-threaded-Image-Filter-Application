@@ -1,7 +1,6 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include<bits/stdc++.h>
 #include "include/stb_image.h"
 #include "include/stb_image_write.h" 
 using namespace std;
@@ -13,31 +12,37 @@ class Image
 
     //variables
     char *file_name;
-    unsigned char* img_data;
-    int height,width,channels;
+    unsigned char* imgData;
+    unsigned char* fil_data;
+    int size,height,width,channels;
 
     //constructor
     Image(char *name)
     {
         file_name=name;
-        img_data = stbi_load(file_name, &width, &height, &channels, 0);
+        imgData = stbi_load(file_name, &width, &height, &channels, 0);
         // dest_folder="output_img/";
 
-        if (img_data == nullptr) 
+        if (imgData == nullptr) 
         {
             cerr << "[INFO]: !!!Error!!! Could not load image\n";
             exit(0);
         }
+        size=height*width*channels;
     }
     void free()
     {
-        stbi_image_free(img_data);
+        stbi_image_free(imgData);
     }
 
-    
+    void saveImage(const char* fname,const unsigned char *data)
+    {
+        stbi_write_jpg(fname,width,height,channels,data,90);
+    }
+
+
+
 };
-
-
 
 
 

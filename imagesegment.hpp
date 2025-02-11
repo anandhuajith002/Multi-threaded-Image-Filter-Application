@@ -17,7 +17,7 @@ class ImageSegment
     static vector< IMGSEG >segmentImageforThread(Image image,int numThread)
     {
         //error handling
-        if (image.img_data == nullptr) {
+        if (image.imgData == nullptr) {
             throw std::invalid_argument("Image cannot be segmented");
         }
         if (numThread == 0) {
@@ -39,6 +39,7 @@ class ImageSegment
             temp.width = image.width;
             temp.channels = image.channels;
 
+
             temp.startRow = currentRow; 
             temp.numRows = baseRowPerSegment;
             if(remainingRow > 0)
@@ -47,41 +48,56 @@ class ImageSegment
                 remainingRow--;
             }
             currentRow += temp.numRows;
-            temp.img_data = image.img_data + temp.startRow * temp.width * temp.channels;
+
+            //calculating size and reverving
+            temp.segsize = temp.numRows * temp.width * temp.channels;
+            temp.img_data = new us_ch[temp.segsize];
+
+            // Copy only the required data for this segment
+            memcpy(temp.img_data, image.imgData + temp.startRow * temp.width * temp.channels, temp.segsize);
+
             segments.push_back(temp);
-            // cout<<"start row"<<temp.startRow<<">> no of rows "<<temp.numRows<<endl;
+
+
         }
         return segments;
     }
 
-static us_ch* reconstructImage(std::vector<IMGSEG> segments, int fHeight, int fWidth)
-{
-    us_ch* finalImg = new us_ch[fHeight * fWidth * 3](); // Allocate memory
 
-    for (auto &seg : segments)
+   
+   static unsigned char* reconstructImage(std::vector<IMGSEG> segments, int fHeight, int fWidth, int channels)
+{
+    // Allocate memory for final image
+    unsigned char* finalImg = new unsigned char[fHeight * fWidth * channels]();
+
+    for (const auto &seg : segments)
     {
         int row = seg.startRow;
-        int col = seg.width;
-
+        
         for (int i = 0; i < seg.numRows; i++)
         {
             for (int j = 0; j < seg.width; j++)
             {
-                int segIndex = ((i * seg.width) + j) * seg.channels;
-                int imgIndex = (((row + i) * fWidth) + (col + j)) * seg.channels;
+                // Bounds checking (though shouldn't be needed if segments were created correctly)
+                if (row + i >= fHeight || j >= fWidth)
+                    continue;
 
-                // Ensure index is within bounds
-                if (imgIndex + 2 < fHeight * fWidth * 3)
+                int segIndex = (i * seg.width + j) * channels;
+                int imgIndex = ((row + i) * fWidth + j) * channels;
+
+                for (int c = 0; c < channels; c++)
                 {
-                    finalImg[imgIndex] = seg.img_data[segIndex];
-                    finalImg[imgIndex + 1] = seg.img_data[segIndex+1];
-                    finalImg[imgIndex + 2] = seg.img_data[segIndex+2];
+                    finalImg[imgIndex + c] = seg.img_data[segIndex + c];
                 }
             }
         }
     }
-    return finalImg; // Return dynamically allocated array (must be freed by the caller)
+    
+    return finalImg;
 }
+
+
+
 
 
     // static function to check size of segment 

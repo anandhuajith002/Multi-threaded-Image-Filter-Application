@@ -8,6 +8,7 @@ typedef struct ImgSeg
     int numRows;
     int width;
     int channels;
+    int segsize;
 }IMGSEG;
 
 typedef unsigned char us_ch;

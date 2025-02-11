@@ -36,3 +36,9 @@
 text_file/
 opencv2/
 .vscode/
+pic/
+output/
+output_img/
+
+#unwanted files
+sample.cpp
