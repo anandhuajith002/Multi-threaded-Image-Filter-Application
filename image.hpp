@@ -11,13 +11,13 @@ class Image
     public:
 
     //variables
-    char *file_name;
+    const char *file_name;
     unsigned char* imgData;
     unsigned char* fil_data;
     int size,height,width,channels;
 
     //constructor
-    Image(char *name)
+    Image(const char *name)
     {
         file_name=name;
         imgData = stbi_load(file_name, &width, &height, &channels, 0);
@@ -28,6 +28,8 @@ class Image
             cerr << "[INFO]: !!!Error!!! Could not load image\n";
             exit(0);
         }
+
+        //caclulating
         size=height*width*channels;
     }
     void free()

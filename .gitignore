@@ -32,6 +32,7 @@
 *.app
 
 
+
 #directories
 text_file/
 opencv2/
@@ -42,3 +43,6 @@ output_img/
 
 #unwanted files
 sample.cpp
+simd.cpp
+temp.cpp
+seg.txt

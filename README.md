@@ -1,108 +1,132 @@
-# Multi-threaded Image Filter Application
+# Multi-Threaded Image Filter Application
 
-## Project Overview
-A high-performance image processing application that applies various filters to images using multi-threading for enhanced processing speed. The project implements custom image processing algorithms and filter operations without relying on external libraries (except for basic image I/O operations).
+A high-performance C++ application that applies image filters using multi-threading to optimize processing speed. The application currently supports grayscale conversion with an architecture designed to easily accommodate additional filters.
 
 ## Features
-- Custom implementation of image processing algorithms
-- Multi-threaded filter application for improved performance
+
+- Multi-threaded image processing for optimal performance
+- Automatic thread count optimization based on hardware
 - Image segmentation for parallel processing
-- Support for various image filters:
-  - Grayscale conversion
-  - *(Planned)* Gaussian blur
-  - *(Planned)* Image sharpening
-  - *(Planned)* Other custom filters
+- Currently supports grayscale filter
+- Extensible architecture for adding new filters
+
+## Prerequisites
+
+- C++ compiler with C++11 support or higher
+- STB Image library
+- CMake (recommended for building)
 
 ## Project Structure
+
 ```
+.
 ├── include/
-│   ├── stb_image.h         # STB library for image I/O
+│   ├── stb_image.h
 │   └── stb_image_write.h
-├── headers/
-│   ├── image.hpp           # Image class definition
-│   ├── filters.hpp         # Image filter implementations
-│   ├── imagesegment.hpp    # Image segmentation for threading
-│   └── thread.hpp          # Thread management
 ├── src/
-│   └── main.cpp            # Main application entry point
-├── output_img/             # Directory for processed images
+│   ├── image.hpp
+│   ├── filters.hpp
+│   ├── imagesegment.hpp
+│   ├── types.hpp
+│   ├── filtersegment.hpp
+│   └── main.cpp
+├── output_img/
+│   └── image.jpg
+├── CMakeLists.txt
 └── README.md
 ```
 
-## Technical Implementation
-- **Image Class**: Handles image loading and basic operations
-- **Filters Class**: Implements various image processing algorithms
-- **ImageSegment Class**: Manages image segmentation for parallel processing
-- **Thread Management**: Utilizes C++11 threads for parallel execution
+## Installation
 
-## Dependencies
-- C++11 or higher
-- STB Image library (included in project)
-- *(Future)* OpenCV (will be used only for image I/O and specific matrix operations)
-
-## Building the Project
+1. Clone the repository:
 ```bash
-# Clone the repository
-git clone [repository-url]
+git clone https://github.com/yourusername/image-filter-app.git
+cd image-filter-app
+```
 
-# Create build directory
-mkdir build && cd build
-
-# Build the project
+2. Build the project:
+```bash
+mkdir build
+cd build
 cmake ..
 make
 ```
 
 ## Usage
+
+Run the application from the command line by providing an input image path:
+
 ```bash
-./image_filter <input_image_path>
+./image_filter input_image.jpg
 ```
 
-Example:
-```bash
-./image_filter input.jpg
-```
+The processed image will be saved as `output_img/image.jpg`.
 
-The processed image will be saved in the `output_img` directory.
+## How It Works
 
-## Current Implementation Details
+1. **Image Loading**: The application loads the input image using the STB Image library.
 
-### Image Processing
-- Custom implementation of basic image operations
-- Direct pixel manipulation without external libraries
-- Support for various image formats through STB library
+2. **Thread Initialization**: 
+   - Automatically determines optimal thread count based on hardware
+   - Creates a thread pool for parallel processing
 
-### Threading Model
-- Dynamic thread allocation based on hardware concurrency
-- Image segmentation for parallel processing
-- Thread-safe implementation for filter applications
+3. **Image Segmentation**:
+   - Divides the input image into segments
+   - Each segment is processed independently
 
-### Memory Management
-- Efficient memory handling for large images
-- Proper cleanup of resources
-- Memory-mapped operations for better performance
+4. **Parallel Processing**:
+   - Assigns image segments to available threads
+   - Currently applies grayscale conversion
+   - Architecture supports adding more filters
 
-## Planned Features
-1. Additional filter implementations:
-   - Gaussian Blur
-   - Sharpening Filter
-   - Edge Detection
-   - Custom Convolution Filters
-2. SIMD optimization for performance
-3. OpenCV integration for specific operations
-4. Performance benchmarking tools
-5. Command-line interface for filter selection
+5. **Image Reconstruction**:
+   - Processed segments are combined into the final image
+   - Result is saved to the output directory
+
+## Implementation Details
+
+### Key Components
+
+- `Image`: Handles image loading, saving, and memory management
+- `ImageSegment`: Manages image segmentation and reconstruction
+- `FilterSegment`: Applies filters to image segments
+- `filters`: Contains filter implementations
+- `types`: Defines custom types used across the application
+
+### Multi-threading
+
+The application uses C++11 threads for parallel processing:
+- Thread count is optimized based on available CPU cores (`hardware_concurrency()-1`)
+- Each thread processes an independent image segment
+- Thread synchronization is handled through `join()`
 
 ## Contributing
-Feel free to contribute to this project by:
+
 1. Fork the repository
 2. Create a feature branch
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
 
+## Future Enhancements
+
+- Additional filter types
+- Custom thread pool implementation
+- GPU acceleration support
+- Real-time image processing
+- Batch processing support
+- Filter chaining
+- Command-line arguments for filter selection
+
 ## License
-[Your chosen license]
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
-- STB Image library for basic image I/O operations
+
+- STB Image library for image processing
+- C++ Standard Library for threading support
+
+## Author
+
+Anandhu Ajith

@@ -33,6 +33,19 @@ class Filters
             }
         }
     }
+    void convertToInvert()
+    {
+        for (int i = 0; i < height; ++i) 
+        {
+            for (int j = 0; j < width; ++j) 
+            {
+                int index = (i * width + j) * channels;
+                filter_data[index]     = 255- filter_data[index];
+                filter_data[index + 1] = 255- filter_data[index + 1];
+                filter_data[index + 2] = 255- filter_data[index + 2];
+            }
+        }
+    }
 
 
     void save_filter_img()
