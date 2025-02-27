@@ -1,122 +1,78 @@
-# Multi-Threaded Image Filter Application
+# Multi-Threaded SIMD Image Processing
 
-A high-performance C++ application that applies image filters using multi-threading to optimize processing speed. The application currently supports grayscale conversion with an architecture designed to easily accommodate additional filters.
+A high-performance C++ application for image processing utilizing multi-threading and SIMD (Single Instruction, Multiple Data) instructions to achieve optimal performance on modern CPUs.
 
 ## Features
 
-- Multi-threaded image processing for optimal performance
-- Automatic thread count optimization based on hardware
-- Image segmentation for parallel processing
-- Currently supports grayscale filter
-- Extensible architecture for adding new filters
+- **SIMD-Accelerated Image Processing**: Uses SSE/SSSE3 instructions to process multiple pixels simultaneously
+- **Multi-Threading Support**: Divides image processing workload across available CPU cores
+- **Automatic CPU Feature Detection**: Falls back to scalar implementation when SIMD features aren't available
+- **RGB to Grayscale Conversion**: Efficiently converts color images to grayscale
 
-## Prerequisites
+## Requirements
 
-- C++ compiler with C++11 support or higher
-- STB Image library
-- CMake (recommended for building)
+- C++11 compatible compiler
+- CPU with SSSE3 support for SIMD acceleration
+- Windows platform (currently uses Windows-specific `__cpuid` intrinsic)
 
 ## Project Structure
 
-```
-.
-├── include/
-│   ├── stb_image.h
-│   └── stb_image_write.h
-├── src/
-│   ├── image.hpp
-│   ├── filters.hpp
-│   ├── imagesegment.hpp
-│   ├── types.hpp
-│   ├── filtersegment.hpp
-│   └── main.cpp
-├── output_img/
-│   └── image.jpg
-├── CMakeLists.txt
-└── README.md
-```
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/image-filter-app.git
-cd image-filter-app
-```
-
-2. Build the project:
-```bash
-mkdir build
-cd build
-cmake ..
-make
-```
-
-## Usage
-
-Run the application from the command line by providing an input image path:
-
-```bash
-./image_filter input_image.jpg
-```
-
-The processed image will be saved as `output_img/image.jpg`.
+- **main.cpp**: Application entry point and orchestration
+- **image.hpp**: Image loading, manipulation and saving using stb_image
+- **imagesegment.hpp**: Handles image division into segments for parallel processing
+- **filtersegment.hpp**: Contains SIMD-optimized and fallback image filters
+- **types.hpp**: Common type definitions and CPU feature detection
 
 ## How It Works
 
-1. **Image Loading**: The application loads the input image using the STB Image library.
+1. **Image Loading**: Loads an image using the STB image library
+2. **Segmentation**: Divides the image into equal segments based on available CPU cores
+3. **Parallel Processing**: Assigns each segment to a separate thread
+4. **SIMD Processing**: Each thread applies SIMD-optimized filters when supported
+5. **Reconstruction**: Combines processed segments back into a single image
+6. **Output**: Saves the processed image to disk
 
-2. **Thread Initialization**: 
-   - Automatically determines optimal thread count based on hardware
-   - Creates a thread pool for parallel processing
+## SIMD Implementation Details
 
-3. **Image Segmentation**:
-   - Divides the input image into segments
-   - Each segment is processed independently
+The RGB to grayscale conversion uses SSSE3 SIMD instructions to process 4 pixels at once:
 
-4. **Parallel Processing**:
-   - Assigns image segments to available threads
-   - Currently applies grayscale conversion
-   - Architecture supports adding more filters
+1. Uses `_mm_shuffle_epi8` to extract R, G, B channels from interleaved pixel data
+2. Widens 8-bit color values to 16-bit using `_mm_unpacklo_epi8`
+3. Applies color coefficients with `_mm_mullo_epi16`
+4. Sums channel contributions and applies appropriate rounding
+5. Packs results back to 8-bit with saturation using `_mm_packus_epi16`
 
-5. **Image Reconstruction**:
-   - Processed segments are combined into the final image
-   - Result is saved to the output directory
+## Building the Project
 
-## Implementation Details
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/simd-image-processing.git
+cd simd-image-processing
 
-### Key Components
+# Build with CMake
+mkdir build
+cd build
+cmake ..
+cmake --build .
 
-- `Image`: Handles image loading, saving, and memory management
-- `ImageSegment`: Manages image segmentation and reconstruction
-- `FilterSegment`: Applies filters to image segments
-- `filters`: Contains filter implementations
-- `types`: Defines custom types used across the application
+# Run the application
+./image_processor
+```
 
-### Multi-threading
+## Performance
 
-The application uses C++11 threads for parallel processing:
-- Thread count is optimized based on available CPU cores (`hardware_concurrency()-1`)
-- Each thread processes an independent image segment
-- Thread synchronization is handled through `join()`
+The SIMD implementation provides significant speedup compared to the scalar version:
+- Processing 4 pixels in parallel with SSE instructions
+- Minimizing branching in inner loops
+- Leveraging the CPU's vector processing units
+- Reducing memory access overhead
 
-## Contributing
+## Future Improvements
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## Future Enhancements
-
-- Additional filter types
-- Custom thread pool implementation
-- GPU acceleration support
-- Real-time image processing
-- Batch processing support
-- Filter chaining
-- Command-line arguments for filter selection
+- Add AVX2/AVX-512 support for processing 8/16 pixels at once
+- Implement more image filters (blur, sharpen, edge detection)
+- Add cross-platform support for CPU feature detection
+- Improve memory management with aligned allocations
 
 ## License
 
@@ -124,9 +80,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- STB Image library for image processing
-- C++ Standard Library for threading support
-
-## Author
-
-Anandhu Ajith
+- [stb_image](https://github.com/nothings/stb) for image loading/saving
